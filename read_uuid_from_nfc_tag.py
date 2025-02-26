@@ -23,6 +23,9 @@ Windows
 3. Put tag on reader, a green light should light up.
 4. Install all requirements by running `pip install -r requirements.txt` inside this project
 5. Run this script by running `python read_uuid_from_nfc_tag.py`
+
+Note: '0300fe00-0000-0000-0000-000000000000' is not a valid UUIDv4, it means no UUID has been
+written to the tag yet.
 '''
 
 def read_block(connection, block):

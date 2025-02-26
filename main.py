@@ -1,10 +1,14 @@
 import eeg.collect_filtered_data
 import eeg.interpolate_data
+import processing.create_radar_animation
 import time
 
 FILE_DATA_FILTERED = 'data/data-filtered.csv'
 FILE_DATA_INTERPOLATED = 'data/data-interpolated.csv'
+FILE_RADAR_ANIMATION = 'artifacts/radar_animation.mp4'
 
-eeg.collect_filtered_data.collect_filtered_data()
-time.sleep(30)
-eeg.interpolate_data.interpolate_to_16_columns(FILE_DATA_FILTERED, FILE_DATA_INTERPOLATED)
+# eeg.collect_filtered_data.collect_filtered_data()
+# time.sleep(30)
+# eeg.interpolate_data.interpolate_to_16_columns(FILE_DATA_FILTERED, FILE_DATA_INTERPOLATED)
+
+processing.create_radar_animation.save_radar_animation(FILE_DATA_INTERPOLATED, FILE_RADAR_ANIMATION)

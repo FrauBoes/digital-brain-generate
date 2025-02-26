@@ -91,8 +91,8 @@ def collect_filtered_data():
             if sensor.is_supported_feature(SensorFeature.Signal):
                 sensor.signalDataReceived = on_signal_received
                 sensor.exec_command(SensorCommand.StartSignal)
-                print("Start signal for 30 seconds")
-                sleep(30)
+                print("Start signal for 5 seconds")
+                sleep(5)
                 sensor.exec_command(SensorCommand.StopSignal)
                 print("Stop signal")
 

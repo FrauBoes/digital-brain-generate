@@ -69,6 +69,8 @@ class RadarAnimation:
         plt.legend(loc="upper right", bbox_to_anchor=(1.1, 1.1), fontsize=10)
         plt.tight_layout()
         plt.show()
+        anim.save("radar_animation.mp4", writer="ffmpeg", fps=10)
+
 
 
 class QuadrantAnimation(QtWidgets.QMainWindow):
@@ -105,7 +107,7 @@ class QuadrantAnimation(QtWidgets.QMainWindow):
         self.current_index = 0
         self.buffer_size = 4
 
-        self.load_csv('eeg/data/data-interpolated.csv')
+        self.load_csv('data/data-interpolated.csv')
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
@@ -150,7 +152,7 @@ class QuadrantAnimation(QtWidgets.QMainWindow):
 
 if __name__ == "__main__":
     channels = [f'Col{i}' for i in range(16)]
-    radar_animation = RadarAnimation('eeg/data/data-interpolated.csv', channels)
+    radar_animation = RadarAnimation('data/data-interpolated.csv', channels)
     radar_animation.animate_radar()
 
     app = QtWidgets.QApplication([])

@@ -1,11 +1,10 @@
 import csv
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-import pyqtgraph as pg
-from PyQt6 import QtCore, QtWidgets
+import numpy as np
 import pandas as pd
-
+import pyqtgraph as pg
+from matplotlib.animation import FuncAnimation
+from PyQt6 import QtCore, QtWidgets
 
 class RadarAnimation:
     def __init__(self, file_path, channels):
@@ -106,7 +105,7 @@ class QuadrantAnimation(QtWidgets.QMainWindow):
         self.current_index = 0
         self.buffer_size = 4
 
-        self.load_csv('generated_dataset.csv')
+        self.load_csv('eeg/data/data-interpolated.csv')
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
@@ -150,8 +149,8 @@ class QuadrantAnimation(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
-    channels = [f'Col{i+1}' for i in range(16)]
-    radar_animation = RadarAnimation('generated_dataset.csv', channels)
+    channels = [f'Col{i}' for i in range(16)]
+    radar_animation = RadarAnimation('eeg/data/data-interpolated.csv', channels)
     radar_animation.animate_radar()
 
     app = QtWidgets.QApplication([])

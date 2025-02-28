@@ -47,8 +47,11 @@ class RadarAnimation:
         frames = len(next(iter(self.data.values())))
         return FuncAnimation(fig, self.update, frames=frames, fargs=(ax, lines, fills, buffer), interval=600, blit=False)
 
-def save_radar_animation(input_file, output_file):
+def run_radar_animation(input_file, output_file):
+    print('run_radar_animation start')
     channels = [f'Col{i}' for i in range(16)]
     radar_animation = RadarAnimation(input_file, channels)
     anim = radar_animation.create_radar_animation()
     anim.save(output_file, writer='ffmpeg', fps=10)
+    print('run_radar_animation end')
+

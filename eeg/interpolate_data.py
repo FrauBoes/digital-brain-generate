@@ -9,6 +9,8 @@ def interpolate_to_16_columns(input_file, output_file):
         input_file (str): Path to the input CSV file with 4 columns.
         output_file (str): Path to save the transformed CSV file with 16 columns.
     """
+    print('interpolate_data start')
+
     # Read the 4-column data
     data = pd.read_csv(input_file, header=None)
  
@@ -29,4 +31,6 @@ def interpolate_to_16_columns(input_file, output_file):
  
     # Save the transformed data to the output file
     expanded_df.to_csv(output_file, index=False)
-    print(f"Data successfully transformed and saved to {output_file}")
+    print(f"... data successfully transformed and saved to {output_file}")
+    print('interpolate_data end')
+

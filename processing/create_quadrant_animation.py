@@ -1,32 +1,31 @@
-import sys
 import numpy as np
 import pandas as pd
 import pyqtgraph as pg
-from PyQt6 import QtWidgets, QtCore, QtGui
-import imageio
+import pyqtgraph.exporters
+import cv2
+import os
+from PyQt6 import QtCore, QtWidgets
 
 class QuadrantAnimation(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, input_csv, output_video, image_folder="quadrant_frames"):
         super().__init__()
 
         self.setWindowTitle("Quadrant Circle Animation")
-        self.resize(800, 600)
+        self.resize(800, 800)
 
         self.plot_widget = pg.PlotWidget(title="Quadrants")
         self.plot_widget.setBackground("black")
         self.plot_widget.setAspectLocked()
-        self.plot_widget.setXRange(-1.5, 1.5)
-        self.plot_widget.setYRange(-1.5, 1.5)
+        self.plot_widget.setXRange(-0.1, 0.1)  # set scale of graph
+        self.plot_widget.setYRange(-0.1, 0.1)
         self.plot_widget.showGrid(x=True, y=True, alpha=0.5)
         self.setCentralWidget(self.plot_widget)
 
-        # Draw static circle
         theta = np.linspace(0, 2 * np.pi, 500)
         x_circle = np.cos(theta)
         y_circle = np.sin(theta)
         self.plot_widget.plot(x_circle, y_circle, pen=pg.mkPen(color='white', width=2))
 
-        # Quadrant lines
         self.quadrant_lines = {
             "Q1": [pg.PlotDataItem(pen=pg.mkPen(color='red', width=2)) for _ in range(4)],
             "Q2": [pg.PlotDataItem(pen=pg.mkPen(color='green', width=2)) for _ in range(4)],
@@ -40,13 +39,15 @@ class QuadrantAnimation(QtWidgets.QMainWindow):
         self.data = []
         self.current_index = 0
         self.buffer_size = 4
-        self.frames = []  # List to store frames for animation
+        self.image_folder = image_folder
+        self.output_video = output_video
+        os.makedirs(self.image_folder, exist_ok=True)
 
-        self.load_csv('data/data-interpolated.csv')
+        self.load_csv(input_csv)
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_plot)
-        self.timer.start(800)
+        self.timer.start(100)
 
     def load_csv(self, file_name):
         try:
@@ -80,48 +81,49 @@ class QuadrantAnimation(QtWidgets.QMainWindow):
                     else:
                         line.clear()
 
-            # Capture frame
-            self.capture_frame()
-
+            self.save_plot(self.current_index)
             self.current_index += 1
         else:
             self.timer.stop()
-            self.save_animation()
+            self.generate_video()
+            self.cleanup_images()
+            QtWidgets.QApplication.quit()
 
-    def capture_frame(self):
-        """Capture the current frame and store it as an image."""
-        pixmap = self.plot_widget.grab()  # Take a snapshot of the plot
-        img = pixmap.toImage()
-        buffer = QtCore.QBuffer()
-        buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
-        img.save(buffer, "PNG")
-        self.frames.append(buffer.data())
+    def save_plot(self, index):
+        exporter = pg.exporters.ImageExporter(self.plot_widget.plotItem)
+        exporter.parameters()["width"] = 800
+        exporter.export(f"{self.image_folder}/quadrant_plot_{index:04d}.png")
 
-    def save_animation(self):
-        """Save the stored frames as a GIF or MP4."""
-        if not self.frames:
-            print("No frames captured.")
+    def generate_video(self):
+        images = sorted([img for img in os.listdir(self.image_folder) if img.endswith(".png")])
+        if not images:
+            print("... no images found for video generation")
             return
 
-        # Convert frames to images
-        images = [QtGui.QImage.fromData(frame) for frame in self.frames]
-        images = [QtGui.QPixmap.fromImage(img).toImage() for img in images]
+        frame = cv2.imread(os.path.join(self.image_folder, images[0]))
+        height, width, layers = frame.shape
+        video = cv2.VideoWriter(self.output_video, cv2.VideoWriter_fourcc(*'mp4v'), 10, (width, height))
 
-        # Save as GIF
-        gif_filename = "quadrant_animation.gif"
-        imageio.mimsave(gif_filename, [self.qimage_to_numpy(img) for img in images], fps=1)
-        print(f"Saved animation as {gif_filename}")
+        for image in images:
+            video.write(cv2.imread(os.path.join(self.image_folder, image)))
 
-    def qimage_to_numpy(self, img):
-        """Convert QImage to a NumPy array."""
-        buffer = QtCore.QBuffer()
-        buffer.open(QtCore.QIODevice.WriteOnly)
-        img.save(buffer, "PNG")
-        np_img = np.frombuffer(buffer.data(), np.uint8)
-        return imageio.imread(np_img)
+        video.release()
+        print(f"... video saved as {self.output_video}")
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    quadrant_window = QuadrantAnimation()
+    def cleanup_images(self):
+        for img_file in os.listdir(self.image_folder):
+            file_path = os.path.join(self.image_folder, img_file)
+            try:
+                os.remove(file_path)
+            except Exception as e:
+                print(f"Error deleting file {file_path}: {e}")
+        print("... all images deleted from quadrant_frames")
+
+def run_quadrant_animation(input_csv, output_video):
+    print('run_quadrant_animation start')
+    app = QtWidgets.QApplication([])
+    quadrant_window = QuadrantAnimation(input_csv, output_video)
     quadrant_window.show()
-    sys.exit(app.exec())
+    app.exec()
+    print('run_quadrant_animation end')
+

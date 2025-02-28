@@ -29,13 +29,12 @@ written to the tag yet.
 '''
 
 def read_block(connection, block):
-    """ Read 4 bytes from the specified NFC tag block """
     READ_CMD = [0xFF, 0xB0, 0x00, block, 0x04]
     response, sw1, sw2 = connection.transmit(READ_CMD)
     if sw1 == 0x90 and sw2 == 0x00:
         return response
     else:
-        print(f"Failed to read block {block}, status words: {sw1:02X} {sw2:02X}")
+        print(f"... failed to read block {block}, status words: {sw1:02X} {sw2:02X}")
         return None
 
 def main():
@@ -46,12 +45,14 @@ def main():
     The first reader is the NFC reader ("Generic EMV Smartcard Reader 0")
     The second reader is the smart card reader ("Generic EMV Smartcard Reader 01")
     '''
+    print('read_uuid_from_nfc_tag start')
+
     r = readers()
     if len(r) == 0:
-        print("No NFC reader found!")
+        print("... no NFC reader found!")
         exit()
 
-    print(f"Using NFC reader: {r[0]}")
+    print(f"... using NFC reader: {r[0]}")
 
     # Connect to the NFC reader
     connection = r[0].createConnection()
@@ -64,13 +65,14 @@ def main():
         if data:
             uuid_bytes.extend(data)
         else:
-            print("Failed to read complete UUID.")
+            print("... failed to read complete UUID.")
             exit()
 
     # Convert UUID bytes to standard UUID string format
     uuid_str = str(uuid.UUID(bytes=bytes(uuid_bytes)))
     
-    print(f"UUID read from tag: {uuid_str}")
+    print(f"... UUID read from tag: {uuid_str}")
+    print('read_uuid_from_nfc_tag end')
 
 if __name__ == "__main__":
     main()

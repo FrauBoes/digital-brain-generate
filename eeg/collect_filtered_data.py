@@ -25,17 +25,17 @@ HIGH_PASS_FREQUENCY = 1
 LOW_PASS_FREQUENCY = 30
 
 DATA_QUEUE = queue.Queue()
-OUTPUT_FILE = 'data/data-filtered.csv'
+OUTPUT_FILE = 'data/data_filtered.csv'
     
 def sensor_found(scanner, sensors):
     for index in range(len(sensors)):
-        print('Sensor found: %s' % sensors[index])
+        print('... sensor found: %s' % sensors[index])
  
 def on_sensor_state_changed(sensor, state):
-    print('Sensor {0} is {1}'.format(sensor.name, state))
+    print('... sensor {0} is {1}'.format(sensor.name, state))
  
 def on_battery_changed(sensor, battery):
-    print('Battery: {0}'.format(battery))
+    print('... battery: {0}'.format(battery))
  
 def save_filtered_data_to_csv(filtered_O1, filtered_O2, filtered_T3, filtered_T4):
     with open(OUTPUT_FILE, mode='a', newline='') as file:
@@ -66,10 +66,11 @@ def collect_filtered_data():
     FILTER_LIST.add_filter(f3)
     
     try:
+        print('collect_filtered_data start')
         scanner = Scanner([SensorFamily.LEBrainBit, SensorFamily.LEBrainBitBlack])
         scanner.sensorsChanged = sensor_found
         scanner.start()
-        print("Starting search for 5 sec ...")
+        print("... starting search for 5 sec")
         sleep(5)
         scanner.stop()
     
@@ -83,7 +84,7 @@ def collect_filtered_data():
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 future = executor.submit(device_connection, current_sensor_info)
                 sensor = future.result()
-                print("Device connected")
+                print("... device connected")
 
             sensor.sensorStateChanged = on_sensor_state_changed
             sensor.batteryChanged = on_battery_changed
@@ -91,17 +92,18 @@ def collect_filtered_data():
             if sensor.is_supported_feature(SensorFeature.Signal):
                 sensor.signalDataReceived = on_signal_received
                 sensor.exec_command(SensorCommand.StartSignal)
-                print("Start signal for 5 seconds")
+                print("... start signal for 5 seconds")
                 sleep(5)
                 sensor.exec_command(SensorCommand.StopSignal)
-                print("Stop signal")
+                print("... stop signal")
 
             sensor.disconnect()
-            print("Disconnect from sensor")
+            print("... disconnect from sensor")
             del sensor
 
         del scanner
-        print('Remove scanner')
+        print('... remove scanner')
+        print('collect_filtered_data end')
 
     except Exception as err:
         print(err)

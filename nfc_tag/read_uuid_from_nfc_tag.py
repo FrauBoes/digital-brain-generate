@@ -1,6 +1,5 @@
 import uuid
 from smartcard.System import readers
-from smartcard.util import toHexString
 
 '''
 Read UUIDv4 from an NFC tag
@@ -37,7 +36,7 @@ def read_block(connection, block):
         print(f"... failed to read block {block}, status words: {sw1:02X} {sw2:02X}")
         return None
 
-def main():
+def get_uuid() -> str:
     '''
     Select the first available NFC reader.
 
@@ -73,6 +72,4 @@ def main():
     
     print(f"... UUID read from tag: {uuid_str}")
     print('read_uuid_from_nfc_tag end')
-
-if __name__ == "__main__":
-    main()
+    return uuid_str

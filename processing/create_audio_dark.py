@@ -1,8 +1,25 @@
 import csv
+import platform
 import subprocess
 from collections import deque
 from midiutil import MIDIFile
 from pydub import AudioSegment
+
+'''
+Create audio from EEG data using MIDI and convert to MP3
+
+MacOS
+1. Install fluidsynth using Homebrew:
+   $ brew install fluidsynth
+
+Windows
+1. Download Fluidsynth for Windows 10 here:  https://github.com/FluidSynth/fluidsynth/releases
+2. Extract the contents of the ZIP file to a folder on your computer, C:\Program Files\fluidsynth
+3. Open Start Menu and search "Environment Variables". Under System Variables, find Path, click Edit and add:
+   C:\Program Files\fluidsynth\bin
+4. Test by opening a new Command Prompt and typing: $ fluidsynth --version
+
+'''
  
 # MIDI Note Constants
 C7_NOTE = 96
@@ -18,7 +35,7 @@ EXTENDED_SCALE = [
     if 0 <= note + 12 * octave <= 127
 ]
 
-SF2_FILE = "tools/FluidR3_GM/FluidR3_GM.sf2"
+SOUNDFONT_PATH = "tools/FluidR3_GM/FluidR3_GM.sf2"
 WAV_FILE = "artifacts/audio-dark.wav"
 MP3_FILE = "artifacts/audio-dark.mp3"
  
@@ -91,9 +108,12 @@ def create_midi(input_file, output_file):
     print(f"MIDI file saved: {output_file}")
 
 def convert_midi_to_mp3(midi_file, soundfont_path, wav_output, mp3_output):
-    # Step 1: Convert MIDI to WAV using the fluidsynth CLI
+    # Get the correct executable name (Windows needs .exe)
+    fluidsynth_cmd = "fluidsynth.exe" if platform.system() == "Windows" else "fluidsynth"
+
+    # Step 1: Convert MIDI to WAV
     subprocess.run([
-        "fluidsynth",
+        fluidsynth_cmd,
         "-ni", soundfont_path,
         midi_file,
         "-F", wav_output,
@@ -103,13 +123,9 @@ def convert_midi_to_mp3(midi_file, soundfont_path, wav_output, mp3_output):
     # Step 2: Convert WAV to MP3
     audio = AudioSegment.from_wav(wav_output)
     audio.export(mp3_output, format="mp3")
-    
-    # Remove the temporary files
-    subprocess.run(["rm", wav_output], check=True)
-    subprocess.run(["rm", midi_file], check=True)
 
     print(f"✅ Done! MP3 saved to: {mp3_output}")
 
 def create_audio(input_file, output_file):
     create_midi(input_file, output_file)
-    convert_midi_to_mp3(output_file, SF2_FILE, WAV_FILE, MP3_FILE)
+    convert_midi_to_mp3(output_file, SOUNDFONT_PATH, WAV_FILE, MP3_FILE)

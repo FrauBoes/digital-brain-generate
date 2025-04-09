@@ -1,6 +1,6 @@
 import eeg.collect_filtered_data
 import eeg.interpolate_data
-import nfc_tag.read_uuid_from_nfc_tag
+import nfc_tag.read_uuid
 import processing.create_audio
 import processing.create_audio_new
 import processing.create_quadrant_animation
@@ -16,6 +16,9 @@ FILE_QUADRANT_ANIMATION = 'artifacts/quadrant_animation.mp4'
 FILE_AUDIO = 'artifacts/audio.mid'
 FILE_AUDIO_NEW = 'artifacts/audio-new.mid'
 
+# Read uuid
+uuid = nfc_tag.read_uuid.read_uuid()
+
 # Read and preprocess data
 eeg.collect_filtered_data.collect_filtered_data()
 time.sleep(30)
@@ -27,10 +30,5 @@ processing.create_quadrant_animation.run_quadrant_animation(FILE_DATA_INTERPOLAT
 processing.create_audio.create_audio(FILE_DATA_FILTERED,FILE_AUDIO)
 processing.create_audio_new.create_midi(FILE_DATA_FILTERED, FILE_AUDIO_NEW)
 
-# Read uuid
-uuid = nfc_tag.read_uuid_from_nfc_tag.get_uuid()
-
 # Upload artifacts
-# for testing
-# uuid = '8e980119-44e2-4e9c-9a90-879f6e05ceee'
 upload.upload_artifacts.upload_artifacts(uuid)

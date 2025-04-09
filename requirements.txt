@@ -21,7 +21,7 @@ pyDes==2.0.1
 pyfilters_lib==1.0.3
 pyneurosdk2==1.0.14
 pyparsing==3.2.1
-PyQt5-Qt5==5.15.16
+PyQt5-Qt5==5.15.2
 PyQt6==6.8.1
 PyQt6-Qt6==6.8.2
 PyQt6_sip==13.10.0

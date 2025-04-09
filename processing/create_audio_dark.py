@@ -1,6 +1,8 @@
 import csv
-from midiutil import MIDIFile
+import subprocess
 from collections import deque
+from midiutil import MIDIFile
+from pydub import AudioSegment
  
 # MIDI Note Constants
 C7_NOTE = 96
@@ -15,6 +17,10 @@ EXTENDED_SCALE = [
     for note in SCALE
     if 0 <= note + 12 * octave <= 127
 ]
+
+SF2_FILE = "tools/FluidR3_GM/FluidR3_GM.sf2"
+WAV_FILE = "artifacts/audio-dark.wav"
+MP3_FILE = "artifacts/audio-dark.mp3"
  
 def adjust_high_pitch(pitch):
     return pitch - 48 if pitch > C7_NOTE else pitch
@@ -83,3 +89,27 @@ def create_midi(input_file, output_file):
         midi_file.writeFile(file)
  
     print(f"MIDI file saved: {output_file}")
+
+def convert_midi_to_mp3(midi_file, soundfont_path, wav_output, mp3_output):
+    # Step 1: Convert MIDI to WAV using the fluidsynth CLI
+    subprocess.run([
+        "fluidsynth",
+        "-ni", soundfont_path,
+        midi_file,
+        "-F", wav_output,
+        "-r", "44100"
+    ], check=True)
+
+    # Step 2: Convert WAV to MP3
+    audio = AudioSegment.from_wav(wav_output)
+    audio.export(mp3_output, format="mp3")
+    
+    # Remove the temporary files
+    subprocess.run(["rm", wav_output], check=True)
+    subprocess.run(["rm", midi_file], check=True)
+
+    print(f"✅ Done! MP3 saved to: {mp3_output}")
+
+def create_audio(input_file, output_file):
+    create_midi(input_file, output_file)
+    convert_midi_to_mp3(output_file, SF2_FILE, WAV_FILE, MP3_FILE)

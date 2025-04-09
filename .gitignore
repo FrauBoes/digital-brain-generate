@@ -5,6 +5,7 @@ uploads/
 venv/
 instance/
 app/instance/
+tools/
 
 
 # Byte-compiled / optimized / DLL files

@@ -16,9 +16,22 @@ Windows
 1. Download Fluidsynth for Windows 10 here:  https://github.com/FluidSynth/fluidsynth/releases
 2. Extract the contents of the ZIP file to a folder on your computer, C:\Program Files\fluidsynth
 3. Open Start Menu and search "Environment Variables". Under System Variables, find Path, click Edit and add:
-   C:\Program Files\fluidsynth\bin
+   C:\Program Files\\fluidsynth\\bin
 4. Test by opening a new Command Prompt and typing: $ fluidsynth --version
-
+5. Download SDL3 from the official site: https://github.com/libsdl-org/SDL/releases
+    5.1. Find the latest SDL3-devel-...-VC.zip (for Visual Studio) or SDL3-...-win32/x64.zip
+    5.2. Inside the zip, you'll find a SDL3.dll file in: lib\\x64\
+    5.3. Copy SDL3.dll into the same folder as fluidsynth.exe, e.g., C:\Program Files\FluidSynth\\bin
+6. Install FFmpeg
+    6.1. Go to: https://ffmpeg.org/download.html Under "Windows" → click on one of the static builds (e.g., gyan.dev)
+    6.2. Download the ffmpeg-release-full.zip or ffmpeg-release-essentials.zip
+    6.3. Unzip it to a folder like C:\\ffmpeg
+    6.4. Inside that folder, you should see ffmpeg.exe in: C:\\ffmpeg\\bin\\ffmpeg.exe
+    6.5. Open Start Menu → search “Environment Variables”
+    6.7. Edit System Environment Variables → "Environment Variables"
+    6.8. Under "System Variables", find and edit Path. Add: C:\\ffmpeg\\bin
+7. Download the SoundFont file (FluidR3_GM.sf2) from: https://member.keymusician.com/Member/FluidR3_GM/index.html
+8. Place the SoundFont file in the /tools/FluidR3_GM/ directory of this project
 '''
  
 # MIDI Note Constants

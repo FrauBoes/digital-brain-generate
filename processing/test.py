@@ -1,0 +1,1 @@
+subprocess.run(["fluidsynth", "-ni", "C:\LTSImmersiveExperience\digital-brain-generate\\tools\FluidR3_GM\FluidR3_GM.sf2", "C:\LTSImmersiveExperience\digital-brain-generate\\artifacts\\audio-dark.mid","-F", "output.wav", "-r", "44100"])
